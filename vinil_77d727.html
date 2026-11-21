@@ -38,7 +38,7 @@ input,select,textarea{max-width:100%}input[type=search],textarea{width:100%}
 .li{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--s2)}.li span{flex:1}
 #toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ac);color:#1a1408;padding:8px 16px;border-radius:20px;font:600 13px system-ui;opacity:0;pointer-events:none;transition:opacity .25s;z-index:9}#toast.on{opacity:1}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
-.av img{object-position:center 20%}.av{border-radius:50%;justify-content:center;align-items:center}.av b{font-size:clamp(22px,7vw,40px)}.big .av b{font-size:clamp(40px,14vw,72px)}.ph{display:flex;align-items:center;justify-content:space-between;background:#000;margin:-16px -16px 0;padding:10px 12px}.ph b{font:700 17px system-ui}.ph button{background:none;border:0;font-size:22px;padding:6px 10px;color:var(--t)}
+.av img{object-position:center 20%}.arow{display:flex;gap:14px;overflow-x:auto;padding:4px 0 10px;margin:4px 0 6px;scrollbar-width:none}.arow::-webkit-scrollbar{display:none}.ap{flex:0 0 76px;text-align:center;color:inherit;text-decoration:none}.ap .cv{width:76px;height:76px;padding:0;box-shadow:0 3px 10px #0008}.ap .cv b{font-size:22px}.ap p{margin:6px 0 0;font-size:12px;line-height:1.2;font-weight:600;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.row .ac{flex:0 0 140px;position:relative}.row .ac .card{display:block}.ab{position:absolute;top:6px;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:#000a;color:#fff;display:flex;align-items:center;justify-content:center;line-height:1}.ab-l{left:6px;color:#fff9}.ab-r{right:6px}.ab-l.on{color:#e8c27a}.ab-r.on{color:#ff6b81}.av{border-radius:50%;justify-content:center;align-items:center}.av b{font-size:clamp(22px,7vw,40px)}.big .av b{font-size:clamp(40px,14vw,72px)}.ph{display:flex;align-items:center;justify-content:space-between;background:#000;margin:-16px -16px 0;padding:10px 12px}.ph b{font:700 17px system-ui}.ph button{background:none;border:0;font-size:22px;padding:6px 10px;color:var(--t)}
 .pm{background:#1c1c1c;border:1px solid #2a2a2a;border-radius:8px;margin:6px 0;display:grid}.pm a{padding:12px 16px;font:14px system-ui;border-bottom:1px solid #2a2a2a}
 .pt{display:flex;margin:0 -16px;background:#000;border-bottom:1px solid #2a2a2a}.pt a{flex:1;text-align:center;padding:13px 2px;font:600 12px system-ui;letter-spacing:.05em;text-transform:uppercase;color:var(--m);border-bottom:3px solid transparent}.pt a.on{color:var(--t);border-bottom-color:#00e054}
 .pa{display:flex;flex-direction:column;align-items:center;padding:28px 0 22px;border-bottom:1px solid #2a2a2a;margin-bottom:16px}.pav{width:96px;height:96px;border-radius:50%;padding:0;overflow:hidden;background:#2c3440;border:2px solid #3a3f47;display:flex;align-items:center;justify-content:center;font:700 32px system-ui}.pav img{width:100%;height:100%;object-fit:cover}.pf{margin-top:8px;font-size:20px}
@@ -954,6 +954,7 @@ const sorters={t:(a,b)=>a.t.localeCompare(b.t),a:(a,b)=>a.a.localeCompare(b.a),y
 function sec(t,list,k){return list.length?`<h2>${t}</h2><div class="row">${list.slice(0,20).map(card).join("")}</div>`:""}
 function home(){const c=cat(),mine=S.c;const day=new Date().getDate();
 return `<div class="top"><h1>Vinil</h1><a href="#perfil" aria-label="Perfil e estatísticas" style="font-size:22px">☺</a></div><p class="sub">Seu catálogo pessoal de discos.</p>
+${artistRow()}
 ${sec("Em destaque hoje",[c[day%c.length],c[(day+5)%c.length],c[(day+9)%c.length]])}
 ${sec("Lançamentos mais recentes",[...c].sort(sorters.yd).slice(0,8))}
 ${sec("Clássicos (até 1979)",c.filter(a=>a.y<1980).sort(sorters.ya))}
@@ -1159,23 +1160,100 @@ return `<h1>Busca</h1><div class="bar">${tb}</div><div class="bar"><input type="
 function sres(){const k=M=="art"?"artistas":"álbuns";if(!Q.trim())return empty("Digite para buscar "+k+". A busca ignora acentos e tolera pequenos erros de grafia.");
 const r=(M=="art"?artists().map(x=>[x,Math.max(...[x.n,x.i.f||"",...(x.i.al||[])].map(s=>sc(s,Q)))]):cat().map(a=>[a,sc(a.t,Q)])).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]||(M=="art"?a[0].n.localeCompare(b[0].n):a[0].t.localeCompare(b[0].t))).map(x=>x[0]);
 return r.length?`<div class="grid">${r.map(M=="art"?cardA:cardx).join("")}</div>`:empty("Nenhum resultado em "+k+" para “"+esc(Q)+"”. Tente outra grafia"+(M=="alb"?" ou adicione o álbum abaixo":"")+".")}
+const AW={"Madonna":"Introduzida ao Rock and Roll Hall of Fame em 2008 e reconhecida pelo Guinness como a artista feminina que mais vendeu discos.",
+"Michael Jackson":"Thriller rendeu oito Grammys em uma só noite, em 1984, recorde na época. Foi introduzido ao Rock and Roll Hall of Fame duas vezes: com os Jackson 5, em 1997, e como solista, em 2001.",
+"The Beatles":"Introduzidos ao Rock and Roll Hall of Fame em 1988. Venceram o Oscar de melhor trilha original por Let It Be e o Grammy de Álbum do Ano por Sgt. Pepper's.",
+"Pink Floyd":"Introduzido ao Rock and Roll Hall of Fame em 1996 e vencedor do Polar Music Prize em 2008.",
+"Led Zeppelin":"Introduzido ao Rock and Roll Hall of Fame em 1995 e homenageado no Kennedy Center Honors em 2012. Recebeu o Grammy pelo conjunto da obra em 2005.",
+"David Bowie":"Introduzido ao Rock and Roll Hall of Fame em 1996. Blackstar rendeu cinco Grammys postumamente, em 2017.",
+"Prince":"Venceu o Oscar de melhor trilha original por Purple Rain e sete Grammys. Introduzido ao Rock and Roll Hall of Fame em 2004.",
+"Stevie Wonder":"Um dos maiores vencedores do Grammy, com 25 prêmios. Recebeu a Medalha Presidencial da Liberdade em 2014 e entrou no Rock and Roll Hall of Fame em 1989.",
+"Marvin Gaye":"Integrou a primeira turma do Rock and Roll Hall of Fame, em 1987, e recebeu o Grammy pelo conjunto da obra em 1996.",
+"Aretha Franklin":"Venceu 18 Grammys e foi a primeira mulher no Rock and Roll Hall of Fame, em 1987. Recebeu a Medalha Presidencial da Liberdade em 2005 e uma menção especial do Pulitzer em 2019.",
+"Miles Davis":"Introduzido ao Rock and Roll Hall of Fame em 2006 e premiado com o Grammy pelo conjunto da obra em 1990.",
+"John Coltrane":"Recebeu o Grammy pelo conjunto da obra em 1992 e uma menção especial do Pulitzer em 2007.",
+"Joni Mitchell":"Venceu 10 Grammys e foi introduzida ao Rock and Roll Hall of Fame em 1997. Recebeu o Kennedy Center Honors em 2020.",
+"Taylor Swift":"Única artista a vencer quatro vezes o Grammy de Álbum do Ano: Fearless, 1989, Folklore e Midnights.",
+"Beyoncé":"Maior vencedora da história do Grammy, com 35 prêmios, incluindo Álbum do Ano por Cowboy Carter, em 2025.",
+"Kendrick Lamar":"Venceu o Pulitzer de Música por DAMN. (2018). Levou cinco Grammys em 2025, incluindo Gravação e Canção do Ano por \"Not Like Us\".",
+"Adele":"Venceu 16 Grammys, incluindo Álbum do Ano por 21 e por 25, e o Oscar de melhor canção original por \"Skyfall\".",
+"Billie Eilish":"Venceu nove Grammys e dois Oscars de melhor canção original, por \"No Time to Die\" e \"What Was I Made For?\".",
+"Lady Gaga":"Venceu o Oscar de melhor canção original por \"Shallow\" (2019) e o Globo de Ouro de melhor atriz em série limitada por American Horror Story: Hotel.",
+"Eminem":"Primeiro artista de rap a vencer o Oscar de melhor canção original, por \"Lose Yourself\". Soma 15 Grammys.",
+"Jay-Z":"Soma 24 Grammys e foi introduzido ao Rock and Roll Hall of Fame em 2021. Foi o primeiro rapper vivo no Songwriters Hall of Fame, em 2017.",
+"Kanye West":"Soma 24 Grammys. My Beautiful Dark Twisted Fantasy venceu o Grammy de Melhor Álbum de Rap em 2011.",
+"Outkast":"Speakerboxxx/The Love Below venceu o Grammy de Álbum do Ano em 2004, feito raro para um grupo de rap.",
+"Lauryn Hill":"The Miseducation of Lauryn Hill rendeu cinco Grammys em 1999, incluindo Álbum do Ano.",
+"Rihanna":"Venceu nove Grammys, foi indicada ao Oscar de melhor canção original por \"Lift Me Up\" e apresentou o intervalo do Super Bowl em 2023.",
+"Britney Spears":"Venceu o Grammy de Melhor Gravação Dance por \"Toxic\" e recebeu o Michael Jackson Video Vanguard Award no VMA de 2011.",
+"Dua Lipa":"Venceu o Grammy de Artista Revelação em 2019 e o de Melhor Álbum Pop Vocal por Future Nostalgia em 2021, além de vários Brit Awards.",
+"Lorde":"Ganhou dois Grammys em 2014, incluindo Canção do Ano por \"Royals\".",
+"Coldplay":"Venceu sete Grammys e múltiplos Brit Awards, incluindo Melhor Grupo Britânico.",
+"Arctic Monkeys":"Whatever People Say I Am, That's What I'm Not venceu o Mercury Prize em 2006, e AM levou o Brit de Melhor Álbum Britânico em 2014.",
+"Radiohead":"Introduzido ao Rock and Roll Hall of Fame em 2019. OK Computer e Kid A renderam Grammys de Melhor Álbum de Música Alternativa.",
+"Portishead":"Venceu o Mercury Prize em 1995 com Dummy.",
+"Daft Punk":"Random Access Memories venceu o Grammy de Álbum do Ano em 2014, e \"Get Lucky\" o de Gravação do Ano.",
+"Arcade Fire":"The Suburbs venceu o Grammy de Álbum do Ano em 2011.",
+"The White Stripes":"Soma seis Grammys, incluindo Melhor Álbum de Música Alternativa por Elephant e por Icky Thump.",
+"Green Day":"Introduzido ao Rock and Roll Hall of Fame em 2015. American Idiot venceu o Grammy de Melhor Álbum de Rock em 2005.",
+"Bruce Springsteen":"Soma 20 Grammys e um Oscar de melhor canção original, por \"Streets of Philadelphia\". Entrou no Rock and Roll Hall of Fame em 1999 e recebeu a Medalha Presidencial da Liberdade em 2016.",
+"Fleetwood Mac":"Rumours venceu o Grammy de Álbum do Ano em 1978. Introduzido ao Rock and Roll Hall of Fame em 1998.",
+"U2":"Soma 22 Grammys e foi introduzido ao Rock and Roll Hall of Fame em 2005.",
+"Nirvana":"Introduzido ao Rock and Roll Hall of Fame em 2014, no primeiro ano de elegibilidade.",
+"The Velvet Underground":"Introduzido ao Rock and Roll Hall of Fame em 1996.",
+"The Clash":"Introduzido ao Rock and Roll Hall of Fame em 2003.",
+"The Beach Boys":"Introduzidos ao Rock and Roll Hall of Fame em 1988.",
+"Amy Winehouse":"Venceu cinco Grammys em 2008, incluindo Gravação e Canção do Ano por \"Rehab\" e Artista Revelação.",
+"Frank Ocean":"channel ORANGE venceu o Grammy de Melhor Álbum Urbano Contemporâneo em 2013.",
+"Tyler, The Creator":"Venceu o Grammy de Melhor Álbum de Rap por Igor e por Call Me If You Get Lost.",
+"Kacey Musgraves":"Golden Hour venceu o Grammy de Álbum do Ano em 2019, entre quatro prêmios naquela noite.",
+"Fiona Apple":"Fetch the Bolt Cutters venceu o Grammy de Melhor Álbum de Música Alternativa em 2021.",
+"Bon Iver":"Venceu dois Grammys em 2012: Artista Revelação e Melhor Álbum de Música Alternativa.",
+"Sufjan Stevens":"Foi indicado ao Oscar de melhor canção original por \"Mystery of Love\".",
+"Olivia Rodrigo":"Venceu três Grammys em 2022, incluindo Artista Revelação e Melhor Álbum Pop Vocal por SOUR.",
+"Phoebe Bridgers":"Foi indicada ao Grammy de Artista Revelação em 2021.",
+"Burna Boy":"Twice as Tall venceu o Grammy de Melhor Álbum de Música Global.",
+"Arooj Aftab":"Primeira artista paquistanesa a vencer um Grammy, por \"Mohabbat\".",
+"Rosalía":"El Mal Querer venceu o Grammy Latino de Álbum do Ano em 2019.",
+"ROSALÍA":"El Mal Querer venceu o Grammy Latino de Álbum do Ano em 2019.",
+"Bad Bunny":"YHLQMDLG venceu o Grammy de Melhor Álbum Latino Pop ou Urbano em 2021.",
+"Bruno Mars":"Venceu o Grammy de Álbum do Ano por 24K Magic em 2018.",
+"Silk Sonic":"Venceu quatro Grammys em 2022, incluindo Gravação e Canção do Ano por \"Leave the Door Open\".",
+"RAYE":"Venceu sete prêmios no Brit Awards de 2024, recorde em uma só noite.",
+"Sampha":"Process venceu o Mercury Prize em 2017.",
+"Little Simz":"Sometimes I Might Be Introvert venceu o Mercury Prize em 2022.",
+"Kate Bush":"Condecorada CBE em 2013 e premiada com vários Brit Awards.",
+"Björk":"Venceu o prêmio de melhor atriz em Cannes por Dançando no Escuro (2000) e foi indicada ao Oscar de melhor canção original por \"I've Seen It All\".",
+"Tom Jobim":"Compôs \"Garota de Ipanema\", gravada em Getz/Gilberto, que venceu o Grammy de Álbum do Ano em 1965.",
+"Caetano Veloso":"Foi a Personalidade do Ano do Grammy Latino em 2012.",
+"Chico Buarque":"Recebeu o Prêmio Camões em 2019.",
+"Elza Soares":"Foi eleita Cantora do Milênio pela BBC de Londres, em 1999.",
+"The Notorious B.I.G.":"Introduzido ao Rock and Roll Hall of Fame em 2020.",
+"2Pac":"Introduzido ao Rock and Roll Hall of Fame em 2017.",
+"Dr. Dre":"Venceu o Grammy de Produtor do Ano em 2000 e foi introduzido ao Rock and Roll Hall of Fame com o N.W.A em 2016.",
+"Drake":"Soma cinco Grammys, incluindo Melhor Álbum de Rap por Take Care.",
+"Nas":"Venceu o primeiro Grammy da carreira com King's Disease, Melhor Álbum de Rap."};
+const esvg=on=>`<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"${on?' fill="currentColor"':""}/>${on?"":'<path d="M3 3l18 18"/>'}</svg>`;
+const hsvg=on=>`<svg viewBox="0 0 24 24" width="16" height="16" fill="${on?"currentColor":"none"}" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>`;
+const acard=a=>{const lis=listens(a.id).length>0,fv=!!(S.u[a.id]&&S.u[a.id].f);return `<div class="ac">${card(a)}${meta(a)?`<small style="color:var(--m)">${meta(a)}</small>`:""}<span class="ab ab-l ${lis?"on":""}" role="img" aria-label="${lis?"Já ouvido":"Ainda não ouvido"}">${esvg(lis)}</span><button class="ab ab-r ${fv?"on":""}" data-a="afav" data-id="${a.id}" aria-pressed="${fv}" aria-label="${fv?"Remover dos favoritos":"Favoritar"}">${hsvg(fv)}</button></div>`};
+function artistRow(){const l=artists().sort((x,y)=>x.n.localeCompare(y.n)),k=(new Date().getDate()*7)%Math.max(l.length,1),r=l.slice(k).concat(l.slice(0,k));return r.length?`<div class="arow" aria-label="Artistas">${r.map(x=>`<a class="ap" href="#artista-${x.id}">${aph(x)}<p>${esc(x.n)}</p></a>`).join("")}</div>`:""}
 function artist(id){const r=artists().find(x=>x.id===id);
 if(!r)return empty("Artista não encontrado.")+`<p style="text-align:center"><a href="#busca">Voltar à Busca</a></p>`;
 const i=r.i,t=i.t||"x",grp="bgdp".includes(t),c=CT[i.c],rows=[],row=(k,v)=>{if(v)rows.push(`<div class="li"><span><small>${k}</small><br>${esc(v)}</span></div>`)};
 const gs=[...new Set(r.al.flatMap(a=>a.g))].join(", ");let desc="";
 if(grp){const org=[i.pl,c&&c[0]].filter(Boolean).join(", ");
-row("Nome do grupo",r.n);row("Ano de formação",i.b);row("Origem",org);row("Integrantes principais",i.m.join(", "));
+row("Ano de formação",i.b);row("Integrantes principais",i.m.join(", "));
 desc=(t=="p"&&i.m.length>1?"Projeto musical colaborativo formado por "+i.m.join(" e ")+".":identOf(r)+".")+(i.b?" Formação: "+i.b+".":"")+(org?" Origem: "+org+".":"")}
 else{const nat=c?(t=="f"?c[2]:t=="m"?c[1]:c[0]):"",nn=t=="x"?"":nat;
-row("Nome artístico",r.n);if(i.f&&norm(i.f)!==norm(r.n))row("Nome completo",i.f);
+if(i.f&&norm(i.f)!==norm(r.n))row("Nome completo",i.f);
 if(i.b&&!i.d)row("Idade",ageAt(i.b)+" anos");if(i.b)row("Data de nascimento",fd(i.b));
 if(i.d)row("Falecimento",fd(i.d)+(i.b?" (aos "+ageAt(i.b,i.d)+" anos)":""));
-row("Nacionalidade",nat);row("Local de nascimento",i.pl);row("Atividade musical",identOf(r));
+
 desc=identOf(r)+(nn?" "+nn:"")+(i.pl?(nn?", ":" ")+"natural de "+i.pl:"")+"."+(i.d?" Faleceu em "+fd(i.d)+(i.b?", aos "+ageAt(i.b,i.d)+" anos":"")+".":"")}
 row("Gêneros nos álbuns do catálogo",gs);
 const n=r.al.length;
-return `<p><a href="javascript:history.back()">‹ Voltar</a></p><div class="hero"><div class="big">${aph(r)}</div><div><h1>${esc(r.n)}</h1><p class="sub">${identOf(r)}</p><p>${esc(desc)}</p><div class="box">${rows.join("")}<small>${IM.has(r.id)?"Dados não confirmados não são exibidos.":"Informações biográficas ainda não disponíveis para este artista."}</small></div></div></div>
-<h2>Álbuns no Letterboxd de Música</h2><p class="sub">${n} ${n>1?"álbuns":"álbum"} de ${esc(r.n)} disponíve${n>1?"is":"l"} no aplicativo, não necessariamente a discografia completa.</p><div class="grid">${[...r.al].sort((a,b)=>a.y-b.y).map(cardx).join("")}</div>`}
+return `<p><a href="javascript:history.back()">‹ Voltar</a></p><div class="hero"><div class="big" style="max-width:200px">${aph(r)}</div><div><h1>${esc(r.n)}</h1><p class="sub">${identOf(r)}</p>${AW[r.n]?`<p>${esc(AW[r.n])}</p>`:""}<div class="box">${rows.join("")}</div></div></div>
+<h2>Álbuns no Letterboxd de Música</h2><p class="sub">${n} ${n>1?"álbuns":"álbum"} de ${esc(r.n)} disponíve${n>1?"is":"l"} no aplicativo, não necessariamente a discografia completa.</p><div class="row">${[...r.al].sort((a,b)=>a.y-b.y).map(acard).join("")}</div>`}
 function listView(ids,st,emptyMsg,extra){let r=ids.map(get).filter(Boolean);if(st.q)r=r.filter(a=>match(a,st.q));const s=st.s;
 r.sort(s=="add"||s=="hear"?(a,b)=>(U(b.id)[s=="add"?"w":"h"]||0)-(U(a.id)[s=="add"?"w":"h"]||0):s=="r"?(a,b)=>(U(b.id).r||0)-(U(a.id).r||0):sorters[s]);
 return r.length?`<div class="grid">${r.map(a=>`<div>${card(a)}<div class="sm">${U(a.id).r?stars(U(a.id).r):""}</div><small style="color:var(--m)">${extra(a)}</small></div>`).join("")}</div>`:empty(emptyMsg)}
@@ -1271,6 +1349,7 @@ if(a=="rate"){const r=t.getBoundingClientRect(),i=+t.dataset.i,val=e.clientX-r.l
 if(a=="unrate"){delete U(id).r;{const le=latest(id);if(le)delete le.r}save();render();toast("Nota removida")}
 else if(a=="w"){const u=U(id);u.w?delete u.w:u.w=Date.now();save();render();toast(u.w?"Adicionado a Quero ouvir":"Removido de Quero ouvir")}
 else if(a=="h"){const u=U(id);if(u.h){delete u.h}else{u.h=Date.now();delete u.w}save();render();toast(u.h?"Registrado como ouvido":"Registro removido")}
+else if(a=="afav"){const u=U(id);u.f=!u.f;save();t.classList.toggle("on",u.f);t.setAttribute("aria-pressed",u.f);t.setAttribute("aria-label",u.f?"Remover dos favoritos":"Favoritar");t.innerHTML=hsvg(u.f);toast(u.f?"Adicionado aos favoritos":"Removido dos favoritos")}
 else if(a=="f"){const u=U(id);u.f=!u.f;save();render();toast(u.f?"Adicionado aos favoritos":"Removido dos favoritos")}
 else if(a=="clear"){F={g:"",d:"",a:"",s:"t",n:24};render()}
 else if(a=="more"){F.n+=24;render()}
